@@ -1,0 +1,663 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CodeCorrect API",
+    "version": "1.0.0",
+    "description": "Programmatic access to CodeCorrect: users, assignments, rubrics, submissions, tests, feedback threads, and courses."
+  },
+  "servers": [
+    { "url": "https://api.codecorrect.app/v1" }
+  ],
+  "security": [{ "bearerAuth": [] }],
+  "tags": [
+    { "name": "Users" },
+    { "name": "Assignments" },
+    { "name": "Rubrics" },
+    { "name": "Submissions" },
+    { "name": "Tests" },
+    { "name": "Threads" },
+    { "name": "Courses" }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "List users",
+        "parameters": [
+          { "$ref": "#/components/parameters/page" },
+          { "$ref": "#/components/parameters/per_page" },
+          {
+            "in": "query",
+            "name": "role",
+            "schema": { "type": "string", "enum": ["student", "instructor", "admin"] }
+          },
+          { "in": "query", "name": "email", "schema": { "type": "string", "format": "email" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedUsers" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserCreate" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Update user",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserUpdate" } } }
+        },
+        "responses": {
+          "200": { "description": "Updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+
+    "/assignments": {
+      "get": {
+        "tags": ["Assignments"],
+        "summary": "List assignments",
+        "parameters": [
+          { "$ref": "#/components/parameters/page" },
+          { "$ref": "#/components/parameters/per_page" },
+          { "in": "query", "name": "course_id", "schema": { "type": "string" } },
+          { "in": "query", "name": "due_before", "schema": { "type": "string", "format": "date-time" } },
+          { "in": "query", "name": "due_after", "schema": { "type": "string", "format": "date-time" } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedAssignments" } } } }
+        }
+      },
+      "post": {
+        "tags": ["Assignments"],
+        "summary": "Create assignment",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssignmentCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assignment" } } } },
+          "400": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/assignments/{id}": {
+      "get": {
+        "tags": ["Assignments"],
+        "summary": "Get assignment",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assignment" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["Assignments"],
+        "summary": "Update assignment",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssignmentUpdate" } } }
+        },
+        "responses": {
+          "200": { "description": "Updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assignment" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+
+    "/rubrics": {
+      "get": {
+        "tags": ["Rubrics"],
+        "summary": "List rubrics",
+        "parameters": [{ "$ref": "#/components/parameters/page" }, { "$ref": "#/components/parameters/per_page" }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedRubrics" } } } }
+        }
+      },
+      "post": {
+        "tags": ["Rubrics"],
+        "summary": "Create rubric",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RubricCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Rubric" } } } },
+          "400": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/rubrics/{id}": {
+      "get": {
+        "tags": ["Rubrics"],
+        "summary": "Get rubric",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Rubric" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+
+    "/submissions": {
+      "get": {
+        "tags": ["Submissions"],
+        "summary": "List submissions",
+        "parameters": [
+          { "$ref": "#/components/parameters/page" },
+          { "$ref": "#/components/parameters/per_page" },
+          { "in": "query", "name": "assignment_id", "schema": { "type": "string" } },
+          { "in": "query", "name": "user_id", "schema": { "type": "string" } },
+          { "in": "query", "name": "status", "schema": { "type": "string", "enum": ["queued", "running", "completed", "failed"] } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedSubmissions" } } } }
+        }
+      },
+      "post": {
+        "tags": ["Submissions"],
+        "summary": "Create submission",
+        "parameters": [{ "$ref": "#/components/parameters/idempotencyKey" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SubmissionCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Queued", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SubmissionEnqueued" } } } },
+          "400": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/submissions/{id}": {
+      "get": {
+        "tags": ["Submissions"],
+        "summary": "Get submission details",
+        "parameters": [
+          { "$ref": "#/components/parameters/idPath" },
+          { "in": "query", "name": "expand", "schema": { "type": "string", "description": "Comma-separated: assignment,user" } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SubmissionDetails" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/submissions/{id}/rerun": {
+      "post": {
+        "tags": ["Submissions"],
+        "summary": "Rerun automated checks",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "requestBody": {
+          "required": false,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SubmissionRerun" } } }
+        },
+        "responses": {
+          "202": { "description": "Re-queued", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SubmissionEnqueued" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+
+    "/assignments/{id}/tests": {
+      "post": {
+        "tags": ["Tests"],
+        "summary": "Attach test suite",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestSuiteCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestSuite" } } } },
+          "400": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "get": {
+        "tags": ["Tests"],
+        "summary": "Get test suite",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestSuite" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+
+    "/submissions/{id}/threads": {
+      "get": {
+        "tags": ["Threads"],
+        "summary": "List feedback threads for a submission",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Thread" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Threads"],
+        "summary": "Create feedback thread",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ThreadCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Thread" } } } }
+        }
+      }
+    },
+    "/threads/{thread_id}/reply": {
+      "post": {
+        "tags": ["Threads"],
+        "summary": "Reply to a thread",
+        "parameters": [{ "in": "path", "name": "thread_id", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ThreadReplyCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ThreadReply" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+
+    "/courses": {
+      "get": {
+        "tags": ["Courses"],
+        "summary": "List courses",
+        "parameters": [{ "$ref": "#/components/parameters/page" }, { "$ref": "#/components/parameters/per_page" }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedCourses" } } } }
+        }
+      },
+      "post": {
+        "tags": ["Courses"],
+        "summary": "Create course",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CourseCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Course" } } } }
+        }
+      }
+    },
+    "/courses/{id}": {
+      "get": {
+        "tags": ["Courses"],
+        "summary": "Get course",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Course" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["Courses"],
+        "summary": "Update course",
+        "parameters": [{ "$ref": "#/components/parameters/idPath" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CourseUpdate" } } }
+        },
+        "responses": {
+          "200": { "description": "Updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Course" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "parameters": {
+      "idPath": { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } },
+      "page": { "in": "query", "name": "page", "schema": { "type": "integer", "default": 1, "minimum": 1 } },
+      "per_page": { "in": "query", "name": "per_page", "schema": { "type": "integer", "default": 25, "maximum": 100 } },
+      "idempotencyKey": {
+        "in": "header",
+        "name": "Idempotency-Key",
+        "required": false,
+        "schema": { "type": "string" },
+        "description": "Provide to safely retry POSTs."
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "Not found",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "ValidationError": {
+        "description": "Validation error",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      }
+    },
+    "schemas": {
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" },
+              "details": { "type": "array", "items": { "type": "object" } },
+              "request_id": { "type": "string" }
+            },
+            "required": ["code", "message"]
+          }
+        },
+        "required": ["error"]
+      },
+
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "page": { "type": "integer" },
+          "per_page": { "type": "integer" },
+          "total": { "type": "integer" }
+        },
+        "required": ["page", "per_page", "total"]
+      },
+
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string", "enum": ["student", "instructor", "admin"] },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "name", "email", "role"]
+      },
+      "UserCreate": {
+        "type": "object",
+        "required": ["name", "email", "role"],
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string", "enum": ["student", "instructor", "admin"] }
+        }
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": { "name": { "type": "string" }, "email": { "type": "string", "format": "email" }, "role": { "type": "string" } }
+      },
+
+      "Course": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "code": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "required": ["id", "title"]
+      },
+      "CourseCreate": {
+        "type": "object",
+        "required": ["title"],
+        "properties": { "title": { "type": "string" }, "code": { "type": "string" }, "description": { "type": "string" } }
+      },
+      "CourseUpdate": { "type": "object", "properties": { "title": { "type": "string" }, "code": { "type": "string" }, "description": { "type": "string" } } },
+      "PaginatedCourses": {
+        "type": "object",
+        "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Course" } }, "meta": { "$ref": "#/components/schemas/PaginationMeta" } },
+        "required": ["data", "meta"]
+      },
+
+      "Assignment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "course_id": { "type": "string" },
+          "language": { "type": "string", "enum": ["python", "js", "java", "cpp"] },
+          "instructions": { "type": "string" },
+          "rubric_id": { "type": "string" },
+          "due_at": { "type": "string", "format": "date-time" },
+          "visibility": { "type": "string", "enum": ["draft", "published", "archived"] },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "title", "language", "visibility"]
+      },
+      "AssignmentCreate": {
+        "type": "object",
+        "required": ["title", "language"],
+        "properties": {
+          "title": { "type": "string" },
+          "course_id": { "type": "string" },
+          "language": { "type": "string", "enum": ["python", "js", "java", "cpp"] },
+          "instructions": { "type": "string" },
+          "rubric_id": { "type": "string" },
+          "due_at": { "type": "string", "format": "date-time" },
+          "visibility": { "type": "string", "enum": ["draft", "published", "archived"], "default": "draft" }
+        }
+      },
+      "AssignmentUpdate": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "course_id": { "type": "string" },
+          "language": { "type": "string", "enum": ["python", "js", "java", "cpp"] },
+          "instructions": { "type": "string" },
+          "rubric_id": { "type": "string" },
+          "due_at": { "type": "string", "format": "date-time" },
+          "visibility": { "type": "string", "enum": ["draft", "published", "archived"] }
+        }
+      },
+      "PaginatedAssignments": {
+        "type": "object",
+        "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Assignment" } }, "meta": { "$ref": "#/components/schemas/PaginationMeta" } },
+        "required": ["data", "meta"]
+      },
+
+      "Criterion": {
+        "type": "object",
+        "properties": {
+          "key": { "type": "string" },
+          "points": { "type": "integer" },
+          "description": { "type": "string" }
+        },
+        "required": ["key", "points"]
+      },
+      "Rubric": {
+        "type": "object",
+        "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "criteria": { "type": "array", "items": { "$ref": "#/components/schemas/Criterion" } } },
+        "required": ["id", "name", "criteria"]
+      },
+      "RubricCreate": {
+        "type": "object",
+        "required": ["name", "criteria"],
+        "properties": { "name": { "type": "string" }, "criteria": { "type": "array", "items": { "$ref": "#/components/schemas/Criterion" } } }
+      },
+      "PaginatedRubrics": {
+        "type": "object",
+        "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Rubric" } }, "meta": { "$ref": "#/components/schemas/PaginationMeta" } },
+        "required": ["data", "meta"]
+      },
+
+      "FileObject": {
+        "type": "object",
+        "properties": { "path": { "type": "string" }, "content_base64": { "type": "string" } },
+        "required": ["path", "content_base64"]
+      },
+      "FeedbackItem": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["lint", "test", "note"] },
+          "path": { "type": "string" },
+          "line": { "type": "integer" },
+          "name": { "type": "string" },
+          "result": { "type": "string" },
+          "message": { "type": "string" }
+        },
+        "required": ["type"]
+      },
+      "Artifact": {
+        "type": "object",
+        "properties": { "type": { "type": "string" }, "url": { "type": "string", "format": "uri" } },
+        "required": ["type", "url"]
+      },
+      "Submission": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "assignment_id": { "type": "string" },
+          "user_id": { "type": "string" },
+          "status": { "type": "string", "enum": ["queued", "running", "completed", "failed"] },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "assignment_id", "user_id", "status"]
+      },
+      "SubmissionCreate": {
+        "type": "object",
+        "required": ["assignment_id", "user_id", "language", "files"],
+        "properties": {
+          "assignment_id": { "type": "string" },
+          "user_id": { "type": "string" },
+          "language": { "type": "string", "enum": ["python", "js", "java", "cpp"] },
+          "files": { "type": "array", "items": { "$ref": "#/components/schemas/FileObject" } },
+          "run_tests": { "type": "boolean", "default": true },
+          "lint": { "type": "boolean", "default": true },
+          "max_runtime_ms": { "type": "integer", "minimum": 500, "maximum": 30000 }
+        }
+      },
+      "SubmissionEnqueued": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "status": { "type": "string", "enum": ["queued", "running", "completed", "failed"] },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "status", "created_at"]
+      },
+      "SubmissionDetails": {
+        "type": "object",
+        "allOf": [{ "$ref": "#/components/schemas/Submission" }],
+        "properties": {
+          "score": { "type": "integer" },
+          "breakdown": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": { "criterion": { "type": "string" }, "points": { "type": "integer" }, "max": { "type": "integer" } },
+              "required": ["criterion", "points", "max"]
+            }
+          },
+          "feedback": { "type": "array", "items": { "$ref": "#/components/schemas/FeedbackItem" } },
+          "runtime_ms": { "type": "integer" },
+          "artifacts": { "type": "array", "items": { "$ref": "#/components/schemas/Artifact" } }
+        }
+      },
+      "SubmissionRerun": {
+        "type": "object",
+        "properties": { "run_tests": { "type": "boolean" }, "lint": { "type": "boolean" } }
+      },
+      "PaginatedSubmissions": {
+        "type": "object",
+        "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Submission" } }, "meta": { "$ref": "#/components/schemas/PaginationMeta" } },
+        "required": ["data", "meta"]
+      },
+
+      "TestSuite": {
+        "type": "object",
+        "properties": {
+          "assignment_id": { "type": "string" },
+          "framework": { "type": "string", "enum": ["pytest", "jest", "junit"] },
+          "timeout_ms": { "type": "integer" },
+          "files": { "type": "array", "items": { "$ref": "#/components/schemas/FileObject" } }
+        },
+        "required": ["assignment_id", "framework", "files"]
+      },
+      "TestSuiteCreate": {
+        "type": "object",
+        "required": ["framework", "files"],
+        "properties": {
+          "framework": { "type": "string", "enum": ["pytest", "jest", "junit"] },
+          "timeout_ms": { "type": "integer" },
+          "files": { "type": "array", "items": { "$ref": "#/components/schemas/FileObject" } }
+        }
+      },
+
+      "Thread": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "submission_id": { "type": "string" },
+          "path": { "type": "string" },
+          "line": { "type": "integer" },
+          "body": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "submission_id", "body"]
+      },
+      "ThreadCreate": {
+        "type": "object",
+        "required": ["body"],
+        "properties": { "path": { "type": "string" }, "line": { "type": "integer" }, "body": { "type": "string" } }
+      },
+      "ThreadReply": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "thread_id": { "type": "string" },
+          "body": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "thread_id", "body"]
+      },
+      "ThreadReplyCreate": {
+        "type": "object",
+        "required": ["body"],
+        "properties": { "body": { "type": "string" } }
+      },
+
+      "PaginatedUsers": {
+        "type": "object",
+        "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/User" } }, "meta": { "$ref": "#/components/schemas/PaginationMeta" } },
+        "required": ["data", "meta"]
+      }
+    }
+  }
+}

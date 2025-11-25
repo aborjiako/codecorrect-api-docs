@@ -1,0 +1,16 @@
+# Ignore compiled JavaScript files - Vercel will build from TypeScript
+api/*.js
+api/*.js.map
+api/*.d.ts
+api/*.d.ts.map
+
+# Ignore dist folder - not needed for Vercel
+dist/
+
+# Ignore node_modules
+node_modules/
+
+# Ignore local env
+.env
+.env.local
+
